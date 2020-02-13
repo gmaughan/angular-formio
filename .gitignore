@@ -28,8 +28,12 @@ Desktop.ini
 # Ngc generated files
 **/*.ngfactory.ts
 
+# Build temp files
+.tmp/
+
 # Build files
 dist/*
 
 # demo tmp files
 .demo
+

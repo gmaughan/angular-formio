@@ -1,5 +1,5 @@
 {
-  "name": "angular-formio",
+  "name": "@gmaughan/angular-formio",
   "version": "4.5.3",
   "scripts": {
     "build": "gulp build",
@@ -18,7 +18,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/formio/angular-formio"
+    "url": "https://github.com/gmaughan/angular-formio"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "author": {
     "name": "Travis Tidwell",
