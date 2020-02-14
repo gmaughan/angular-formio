@@ -12,8 +12,14 @@ var SubmissionComponent = /** @class */ (function () {
         this.service = service;
         this.route = route;
     }
+    SubmissionComponent.prototype.setDownloadUrl = function (url) {
+        this.downloadUrl = url;
+    };
     SubmissionComponent.prototype.ngOnInit = function () {
-        this.service.setSubmission(this.route);
+        var _this = this;
+        this.service.setSubmission(this.route).then(function (formio) {
+            formio.getDownloadUrl().then(function (url) { return _this.setDownloadUrl(url); });
+        });
     };
     SubmissionComponent = __decorate([
         core_1.Component({

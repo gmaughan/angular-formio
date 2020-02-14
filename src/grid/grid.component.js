@@ -12,18 +12,19 @@ var formiojs_1 = require("formiojs");
 var index_1 = require("./form/index");
 var index_2 = require("./submission/index");
 var FormioGridComponent = /** @class */ (function () {
-    function FormioGridComponent(loader, alerts, resolver) {
+    function FormioGridComponent(loader, alerts, resolver, ref) {
         this.loader = loader;
         this.alerts = alerts;
         this.resolver = resolver;
+        this.ref = ref;
         this.page = 0;
         this.isLoading = false;
         this.initialized = false;
-        this.rowSelect = new core_1.EventEmitter();
+        this.select = this.rowSelect = new core_1.EventEmitter();
         this.rowAction = new core_1.EventEmitter();
         this.createItem = new core_1.EventEmitter();
         this.error = new core_1.EventEmitter();
-        this.loader.loading = true;
+        this.loader.setLoading(true);
     }
     FormioGridComponent.prototype.createComponent = function (property, component) {
         var factory = this.resolver.resolveComponentFactory(component);
@@ -45,27 +46,44 @@ var FormioGridComponent = /** @class */ (function () {
             this.formio = new formiojs_1.Formio(this.src, { formOnly: true });
         }
         // Load the header.
-        this.header.load(this.formio).then(function () { return _this.setPage(0); });
+        this.header.load(this.formio)
+            .then(function () { return _this.setPage(0); })
+            .catch(function (error) { return _this.onError(error); });
     };
     FormioGridComponent.prototype.ngOnInit = function () {
         var _this = this;
         // Create our components.
         var comps = this.components || ((this.gridType === 'form') ? index_1.default : index_2.default);
         this.header = this.createComponent(this.headerElement, comps.header);
+        this.header.actionAllowed = this.actionAllowed.bind(this);
         this.header.sort.subscribe(function (header) { return _this.sortColumn(header); });
         this.body = this.createComponent(this.bodyElement, comps.body);
         this.body.header = this.header;
+        this.body.actionAllowed = this.actionAllowed.bind(this);
         this.body.rowSelect.subscribe(function (row) { return _this.rowSelect.emit(row); });
         this.body.rowAction.subscribe(function (action) { return _this.rowAction.emit(action); });
         this.footer = this.createComponent(this.footerElement, comps.footer);
         this.footer.header = this.header;
         this.footer.body = this.body;
+        this.footer.actionAllowed = this.actionAllowed.bind(this);
+        this.footer.createText = this.createText;
+        this.footer.size = this.size;
         this.footer.pageChanged.subscribe(function (page) { return _this.pageChanged(page); });
         this.footer.createItem.subscribe(function (item) { return _this.createItem.emit(item); });
     };
     FormioGridComponent.prototype.ngOnChanges = function (changes) {
-        if (this.initialized && changes.src && changes.src.currentValue) {
-            this.loadGrid(changes.src.currentValue);
+        if (this.initialized) {
+            if ((changes.src && changes.src.currentValue) ||
+                (changes.formio && changes.formio.currentValue)) {
+                this.loadGrid(changes.src.currentValue);
+            }
+            if (changes.items && changes.items.currentValue) {
+                this.refreshGrid();
+            }
+        }
+        if (this.footer &&
+            (changes.createText && changes.createText.currentValue)) {
+            this.footer.createText = changes.createText.currentValue;
         }
     };
     FormioGridComponent.prototype.ngAfterViewInit = function () {
@@ -75,17 +93,28 @@ var FormioGridComponent = /** @class */ (function () {
         if (this.refresh) {
             this.refresh.subscribe(function (query) { return _this.refreshGrid(query); });
         }
-        // Load the grid.
         this.loadGrid(this.src);
+        this.initialized = true;
+        this.ref.detectChanges();
     };
     Object.defineProperty(FormioGridComponent.prototype, "loading", {
         set: function (_loading) {
-            this.loader.loading = this.isLoading = _loading;
+            this.isLoading = _loading;
+            this.loader.setLoading(_loading);
         },
         enumerable: true,
         configurable: true
     });
+    FormioGridComponent.prototype.actionAllowed = function (action) {
+        if (this.isActionAllowed) {
+            return this.isActionAllowed(action);
+        }
+        else {
+            return true;
+        }
+    };
     FormioGridComponent.prototype.onError = function (error) {
+        this.loading = false;
         this.error.emit(error);
         this.alerts.setAlert({
             type: 'danger',
@@ -95,19 +124,28 @@ var FormioGridComponent = /** @class */ (function () {
     FormioGridComponent.prototype.refreshGrid = function (query) {
         var _this = this;
         this.alerts.setAlerts([]);
-        query = query || {};
-        query = lodash_1.assign(query, this.query);
-        if (!query.hasOwnProperty('limit')) {
-            query.limit = 10;
+        this.query = query || this.query;
+        if (!this.query.hasOwnProperty('limit')) {
+            this.query.limit = 10;
         }
-        if (!query.hasOwnProperty('skip')) {
-            query.skip = 0;
+        if (!this.query.hasOwnProperty('skip')) {
+            this.query.skip = 0;
         }
         this.loading = true;
-        this.body.load(this.formio, this.query).then(function (info) {
+        this.ref.detectChanges();
+        formiojs_1.Formio.cache = {};
+        var loader = null;
+        if (this.items) {
+            loader = Promise.resolve(this.body.setRows(this.query, this.items));
+        }
+        else {
+            loader = this.body.load(this.formio, this.query);
+        }
+        loader.then(function (info) {
             _this.loading = false;
             _this.initialized = true;
-        });
+            _this.ref.detectChanges();
+        }).catch(function (error) { return _this.onError(error); });
     };
     FormioGridComponent.prototype.setPage = function (num) {
         if (num === void 0) { num = -1; }
@@ -155,6 +193,9 @@ var FormioGridComponent = /** @class */ (function () {
     ], FormioGridComponent.prototype, "src", void 0);
     __decorate([
         core_1.Input()
+    ], FormioGridComponent.prototype, "items", void 0);
+    __decorate([
+        core_1.Input()
     ], FormioGridComponent.prototype, "onForm", void 0);
     __decorate([
         core_1.Input()
@@ -167,10 +208,22 @@ var FormioGridComponent = /** @class */ (function () {
     ], FormioGridComponent.prototype, "gridType", void 0);
     __decorate([
         core_1.Input()
+    ], FormioGridComponent.prototype, "size", void 0);
+    __decorate([
+        core_1.Input()
     ], FormioGridComponent.prototype, "components", void 0);
     __decorate([
         core_1.Input()
     ], FormioGridComponent.prototype, "formio", void 0);
+    __decorate([
+        core_1.Input()
+    ], FormioGridComponent.prototype, "createText", void 0);
+    __decorate([
+        core_1.Input()
+    ], FormioGridComponent.prototype, "isActionAllowed", void 0);
+    __decorate([
+        core_1.Output()
+    ], FormioGridComponent.prototype, "select", void 0);
     __decorate([
         core_1.Output()
     ], FormioGridComponent.prototype, "rowSelect", void 0);
@@ -184,13 +237,13 @@ var FormioGridComponent = /** @class */ (function () {
         core_1.Output()
     ], FormioGridComponent.prototype, "error", void 0);
     __decorate([
-        core_1.ViewChild('headerTemplate', { read: core_1.ViewContainerRef })
+        core_1.ViewChild('headerTemplate', { read: core_1.ViewContainerRef, static: true })
     ], FormioGridComponent.prototype, "headerElement", void 0);
     __decorate([
-        core_1.ViewChild('bodyTemplate', { read: core_1.ViewContainerRef })
+        core_1.ViewChild('bodyTemplate', { read: core_1.ViewContainerRef, static: true })
     ], FormioGridComponent.prototype, "bodyElement", void 0);
     __decorate([
-        core_1.ViewChild('footerTemplate', { read: core_1.ViewContainerRef })
+        core_1.ViewChild('footerTemplate', { read: core_1.ViewContainerRef, static: true })
     ], FormioGridComponent.prototype, "footerElement", void 0);
     FormioGridComponent = __decorate([
         core_1.Component({

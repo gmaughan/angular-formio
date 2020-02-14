@@ -1,9 +1,9 @@
 {
-  "name": "formio-grid",
+  "name": "@gmaughan/formio-grid",
   "version": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/formio/angular-formio"
+    "url": "https://github.com/gmaughan/angular-formio"
   },
   "author": {
     "name": "Travis Tidwell",
@@ -14,7 +14,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/formio/angular-formio/issues"
+    "url": "https://github.com/gmaughan/angular-formio/issues"
   },
   "main": "formio-grid.umd.js",
   "module": "index.js",

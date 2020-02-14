@@ -6,23 +6,19 @@ var edit_component_1 = require("./edit/edit.component");
 var delete_component_1 = require("./delete/delete.component");
 var create_component_1 = require("./create/create.component");
 var index_component_1 = require("./index/index.component");
-/**
- * The routes used to define a resource.
- */
 function FormioResourceRoutes(config) {
-    config = config || {};
     return [
         {
             path: '',
-            component: config.index || index_component_1.FormioResourceIndexComponent
+            component: config && config.index ? config.index : index_component_1.FormioResourceIndexComponent
         },
         {
             path: 'new',
-            component: config.create || create_component_1.FormioResourceCreateComponent
+            component: config && config.create ? config.create : create_component_1.FormioResourceCreateComponent
         },
         {
             path: ':id',
-            component: config.resource || resource_component_1.FormioResourceComponent,
+            component: config && config.resource ? config.resource : resource_component_1.FormioResourceComponent,
             children: [
                 {
                     path: '',
@@ -31,15 +27,15 @@ function FormioResourceRoutes(config) {
                 },
                 {
                     path: 'view',
-                    component: config.view || view_component_1.FormioResourceViewComponent
+                    component: config && config.view ? config.view : view_component_1.FormioResourceViewComponent
                 },
                 {
                     path: 'edit',
-                    component: config.edit || edit_component_1.FormioResourceEditComponent
+                    component: config && config.edit ? config.edit : edit_component_1.FormioResourceEditComponent
                 },
                 {
                     path: 'delete',
-                    component: config.delete || delete_component_1.FormioResourceDeleteComponent
+                    component: config && config.delete ? config.delete : delete_component_1.FormioResourceDeleteComponent
                 }
             ]
         }

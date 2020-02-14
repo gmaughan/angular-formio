@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var common_1 = require("@angular/common");
 var forms_1 = require("@angular/forms");
+var router_1 = require("@angular/router");
 var formio_module_1 = require("../formio.module");
 var formio_loader_1 = require("../components/loader/formio.loader");
 var formio_alerts_1 = require("../components/alerts/formio.alerts");
@@ -29,6 +30,7 @@ var FormioGrid = /** @class */ (function () {
                 common_1.CommonModule,
                 forms_1.FormsModule,
                 formio_module_1.FormioModule,
+                router_1.RouterModule,
                 pagination_1.PaginationModule.forRoot()
             ],
             declarations: [

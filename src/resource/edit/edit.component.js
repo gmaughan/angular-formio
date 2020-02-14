@@ -13,14 +13,17 @@ var FormioResourceEditComponent = /** @class */ (function () {
         this.route = route;
         this.router = router;
         this.config = config;
+        this.triggerError = new core_1.EventEmitter();
     }
     FormioResourceEditComponent.prototype.onSubmit = function (submission) {
         var _this = this;
         var edit = this.service.resource;
         edit.data = submission.data;
-        this.service.save(edit).then(function () {
+        this.service.save(edit)
+            .then(function () {
             _this.router.navigate(['../', 'view'], { relativeTo: _this.route });
-        });
+        })
+            .catch(function (err) { return _this.triggerError.emit(err); });
     };
     FormioResourceEditComponent = __decorate([
         core_1.Component({

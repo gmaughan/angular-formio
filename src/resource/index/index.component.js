@@ -17,30 +17,35 @@ var FormioResourceIndexComponent = /** @class */ (function () {
     }
     FormioResourceIndexComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.service.initialize();
         this.gridQuery = {};
-        if (this.service &&
-            this.service.onParents &&
-            this.config.parents &&
-            this.config.parents.length) {
-            // Wait for the parents to load before loading this grid.
-            this.service.onParents.subscribe(function (parents) {
-                lodash_1.each(parents, function (parent) {
-                    if (parent) {
-                        _this.gridQuery['data.' + parent.name + '._id'] =
-                            parent.resource._id;
-                    }
+        this.service.setContext(this.route);
+        this.service.formLoaded.then(function () {
+            if (_this.service &&
+                _this.config.parents &&
+                _this.config.parents.length) {
+                _this.service.loadParents().then(function (parents) {
+                    lodash_1.each(parents, function (parent) {
+                        if (parent && parent.filter) {
+                            _this.gridQuery['data.' + parent.name + '._id'] =
+                                parent.resource._id;
+                        }
+                    });
+                    // Set the source to load the grid.
+                    _this.gridSrc = _this.service.formUrl;
+                    _this.createText = "New " + _this.service.form.title;
                 });
-                // Set the source to load the grid.
+            }
+            else if (_this.service.formUrl) {
                 _this.gridSrc = _this.service.formUrl;
-            });
-        }
-        else if (this.service.formUrl) {
-            this.gridSrc = this.service.formUrl;
-        }
+                _this.createText = "New " + _this.service.form.title;
+            }
+        });
     };
     FormioResourceIndexComponent.prototype.onSelect = function (row) {
         this.router.navigate([row._id, 'view'], { relativeTo: this.route });
+    };
+    FormioResourceIndexComponent.prototype.onCreateItem = function () {
+        this.router.navigate(['new'], { relativeTo: this.route });
     };
     FormioResourceIndexComponent = __decorate([
         core_1.Component({

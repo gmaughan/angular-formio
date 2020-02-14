@@ -10,6 +10,7 @@ var core_1 = require("@angular/core");
 var router_1 = require("@angular/router");
 var common_1 = require("@angular/common");
 var formio_module_1 = require("../formio.module");
+var formio_alerts_1 = require("../components/alerts/formio.alerts");
 var grid_module_1 = require("../grid/grid.module");
 var resource_component_1 = require("./resource.component");
 var view_component_1 = require("./view/view.component");
@@ -45,6 +46,9 @@ var FormioResource = /** @class */ (function () {
                 view_component_1.FormioResourceViewComponent,
                 edit_component_1.FormioResourceEditComponent,
                 delete_component_1.FormioResourceDeleteComponent
+            ],
+            providers: [
+                formio_alerts_1.FormioAlerts
             ]
         })
     ], FormioResource);

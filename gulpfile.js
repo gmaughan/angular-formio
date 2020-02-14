@@ -170,11 +170,11 @@ const rollupFesm = function(name, path) {
     .pipe(gulp.dest(`${distFolder}${path}`));
 };
 
-gulp.task('rollup:fesm', () => rollupFesm('angular-formio'));
-gulp.task('rollup-auth:fesm', () => rollupFesm('formio-auth', '/auth'));
-gulp.task('rollup-manager:fesm', () => rollupFesm('formio-manager', '/manager'));
-gulp.task('rollup-grid:fesm', () => rollupFesm('formio-grid', '/grid'));
-gulp.task('rollup-resource:fesm', () => rollupFesm('formio-resource', '/resource'));
+gulp.task('rollup:fesm', () => rollupFesm('@gmaughan/angular-formio'));
+gulp.task('rollup-auth:fesm', () => rollupFesm('@gmaughan/formio-auth', '/auth'));
+gulp.task('rollup-manager:fesm', () => rollupFesm('@gmaughan/formio-manager', '/manager'));
+gulp.task('rollup-grid:fesm', () => rollupFesm('@gmaughan/formio-grid', '/grid'));
+gulp.task('rollup-resource:fesm', () => rollupFesm('@gmaughan/formio-resource', '/resource'));
 
 /**
  * 6. Run rollup inside the /build folder to generate our UMD module and place the
@@ -228,11 +228,11 @@ const rollupUmd = function(name, path) {
     .pipe(rename(`${name}.umd.js`))
     .pipe(gulp.dest(`${distFolder}${path}`));
 };
-gulp.task('rollup:umd', () => rollupUmd('angular-formio'));
-gulp.task('rollup-auth:umd', () => rollupUmd('formio-auth', '/auth'));
-gulp.task('rollup-manager:umd', () => rollupUmd('formio-manager', '/manager'));
-gulp.task('rollup-grid:umd', () => rollupUmd('formio-grid', '/grid'));
-gulp.task('rollup-resource:umd', () => rollupUmd('formio-resource', '/resource'));
+gulp.task('rollup:umd', () => rollupUmd('@gmaughan/angular-formio'));
+gulp.task('rollup-auth:umd', () => rollupUmd('@gmaughan/formio-auth', '/auth'));
+gulp.task('rollup-manager:umd', () => rollupUmd('@gmaughan/formio-manager', '/manager'));
+gulp.task('rollup-grid:umd', () => rollupUmd('@gmaughan/formio-grid', '/grid'));
+gulp.task('rollup-resource:umd', () => rollupUmd('@gmaughan/formio-resource', '/resource'));
 
 /**
  * 7. Copy all the files from /build to /dist, except .js files. We ignore all .js from /build

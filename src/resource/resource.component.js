@@ -8,13 +8,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var FormioResourceComponent = /** @class */ (function () {
-    function FormioResourceComponent(service, route) {
+    function FormioResourceComponent(service, route, auth, changeDetectorRef) {
         this.service = service;
         this.route = route;
+        this.auth = auth;
+        this.changeDetectorRef = changeDetectorRef;
+        this.perms = { delete: false, edit: false };
     }
     FormioResourceComponent.prototype.ngOnInit = function () {
-        this.service.initialize();
+        var _this = this;
         this.service.loadResource(this.route);
+        this.service.formLoaded.then(function (form) {
+            _this.auth.ready.then(function () {
+                _this.service.resourceLoaded.then(function (resource) {
+                    _this.service.formFormio.userPermissions(_this.auth.user, form, resource).then(function (perms) {
+                        _this.perms.delete = perms.delete;
+                        _this.perms.edit = perms.edit;
+                        _this.changeDetectorRef.detectChanges();
+                    });
+                });
+            });
+        });
     };
     FormioResourceComponent = __decorate([
         core_1.Component({

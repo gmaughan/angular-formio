@@ -13,6 +13,7 @@ var forms_1 = require("@angular/forms");
 var formio_module_1 = require("../formio.module");
 var grid_module_1 = require("../grid/grid.module");
 var index_component_1 = require("./index/index.component");
+var create_component_1 = require("./create/create.component");
 var form_component_1 = require("./form/form.component");
 var view_component_1 = require("./view/view.component");
 var edit_component_1 = require("./edit/edit.component");
@@ -24,6 +25,7 @@ var view_component_2 = require("./submission/view/view.component");
 var index_component_2 = require("./submission/index/index.component");
 var form_manager_routes_1 = require("./form-manager.routes");
 var pagination_1 = require("ngx-bootstrap/pagination");
+var modal_1 = require("ngx-bootstrap/modal");
 var formio_utils_1 = require("../formio.utils");
 var FormManagerModule = /** @class */ (function () {
     function FormManagerModule() {
@@ -44,10 +46,12 @@ var FormManagerModule = /** @class */ (function () {
                 router_1.RouterModule,
                 forms_1.FormsModule,
                 grid_module_1.FormioGrid,
+                modal_1.ModalModule.forRoot(),
                 pagination_1.PaginationModule.forRoot()
             ],
             declarations: [
                 index_component_1.FormManagerIndexComponent,
+                create_component_1.FormManagerCreateComponent,
                 form_component_1.FormManagerFormComponent,
                 view_component_1.FormManagerViewComponent,
                 edit_component_1.FormManagerEditComponent,

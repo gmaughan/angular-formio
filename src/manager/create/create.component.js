@@ -20,38 +20,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
-var lodash_1 = require("lodash");
-var GridBodyComponent_1 = require("../GridBodyComponent");
-var SubmissionGridBodyComponent = /** @class */ (function (_super) {
-    __extends(SubmissionGridBodyComponent, _super);
-    function SubmissionGridBodyComponent() {
+var edit_component_1 = require("../edit/edit.component");
+var FormManagerCreateComponent = /** @class */ (function (_super) {
+    __extends(FormManagerCreateComponent, _super);
+    function FormManagerCreateComponent() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    SubmissionGridBodyComponent.prototype.load = function (formio, query) {
-        var _this = this;
-        query = query || {};
-        return formio.loadSubmissions({ params: query })
-            .then(function (submissions) { return _this.setRows(query, submissions); });
+    FormManagerCreateComponent.prototype.ngOnInit = function () {
+        this.service.reset();
     };
-    /**
-     * Render the cell data.
-     *
-     * @param row
-     * @param header
-     * @return any
-     */
-    SubmissionGridBodyComponent.prototype.view = function (row, header) {
-        var cellValue = lodash_1.get(row, header.key);
-        if (typeof header.component.getView === 'function') {
-            return header.component.getView(cellValue);
-        }
-        return header.component.asString(cellValue);
-    };
-    SubmissionGridBodyComponent = __decorate([
+    FormManagerCreateComponent = __decorate([
         core_1.Component({
-            templateUrl: './SubmissionGridBody.component.html'
+            templateUrl: '../edit/edit.component.html'
         })
-    ], SubmissionGridBodyComponent);
-    return SubmissionGridBodyComponent;
-}(GridBodyComponent_1.GridBodyComponent));
-exports.SubmissionGridBodyComponent = SubmissionGridBodyComponent;
+    ], FormManagerCreateComponent);
+    return FormManagerCreateComponent;
+}(edit_component_1.FormManagerEditComponent));
+exports.FormManagerCreateComponent = FormManagerCreateComponent;

@@ -23,10 +23,13 @@ var GridHeaderComponent = /** @class */ (function () {
         return Promise.resolve([]);
     };
     __decorate([
+        core_1.Input()
+    ], GridHeaderComponent.prototype, "actionAllowed", void 0);
+    __decorate([
         core_1.Output()
     ], GridHeaderComponent.prototype, "sort", void 0);
     __decorate([
-        core_1.ViewChild(core_1.TemplateRef)
+        core_1.ViewChild(core_1.TemplateRef, { static: true })
     ], GridHeaderComponent.prototype, "template", void 0);
     return GridHeaderComponent;
 }());

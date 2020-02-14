@@ -7,10 +7,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
+var rxjs_1 = require("rxjs");
 var FormioLoader = /** @class */ (function () {
     function FormioLoader() {
+        this.loading$ = new rxjs_1.BehaviorSubject(true);
         this.loading = true;
     }
+    FormioLoader.prototype.setLoading = function (loading) {
+        this.loading = loading;
+        this.loading$.next(loading);
+    };
     FormioLoader = __decorate([
         core_1.Injectable()
     ], FormioLoader);

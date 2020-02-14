@@ -10,8 +10,12 @@ var core_1 = require("@angular/core");
 var formio_alerts_1 = require("./formio.alerts");
 var FormioAlertsComponent = /** @class */ (function () {
     function FormioAlertsComponent() {
-        this.alerts = new formio_alerts_1.FormioAlerts();
     }
+    FormioAlertsComponent.prototype.ngOnInit = function () {
+        if (!this.alerts) {
+            this.alerts = new formio_alerts_1.FormioAlerts();
+        }
+    };
     __decorate([
         core_1.Input()
     ], FormioAlertsComponent.prototype, "alerts", void 0);

@@ -7,15 +7,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
-var FormManagerConfig = /** @class */ (function () {
-    function FormManagerConfig() {
-        this.tag = '';
-        this.includeSearch = false;
-        this.saveDraft = false;
+var CustomTagsService = /** @class */ (function () {
+    function CustomTagsService() {
+        this.tags = [];
     }
-    FormManagerConfig = __decorate([
+    CustomTagsService.prototype.addCustomTag = function (tag) {
+        this.tags.push(tag);
+    };
+    CustomTagsService = __decorate([
         core_1.Injectable()
-    ], FormManagerConfig);
-    return FormManagerConfig;
+    ], CustomTagsService);
+    return CustomTagsService;
 }());
-exports.FormManagerConfig = FormManagerConfig;
+exports.CustomTagsService = CustomTagsService;

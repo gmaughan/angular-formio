@@ -8,11 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var FormioResources = /** @class */ (function () {
-    function FormioResources() {
+    function FormioResources(auth) {
+        this.auth = auth;
         this.resources = {};
         this.error = new core_1.EventEmitter();
         this.onError = this.error;
-        this.resources = {};
+        this.resources = {
+            currentUser: {
+                resourceLoaded: this.auth.userReady
+            }
+        };
     }
     FormioResources = __decorate([
         core_1.Injectable()

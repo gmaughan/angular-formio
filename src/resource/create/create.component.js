@@ -17,8 +17,7 @@ var FormioResourceCreateComponent = /** @class */ (function () {
         this.onSuccess = new core_1.EventEmitter();
     }
     FormioResourceCreateComponent.prototype.ngOnInit = function () {
-        // Start with fresh data.
-        this.service.initialize();
+        this.service.setContext(this.route);
     };
     FormioResourceCreateComponent.prototype.onSubmit = function (submission) {
         var _this = this;

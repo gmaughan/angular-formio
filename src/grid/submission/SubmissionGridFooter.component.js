@@ -1,8 +1,11 @@
 "use strict";
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -21,8 +24,13 @@ var GridFooterComponent_1 = require("../GridFooterComponent");
 var SubmissionGridFooterComponent = /** @class */ (function (_super) {
     __extends(SubmissionGridFooterComponent, _super);
     function SubmissionGridFooterComponent() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        return _super.call(this) || this;
     }
+    SubmissionGridFooterComponent.prototype.ngOnInit = function () {
+        if (!this.size) {
+            this.size = 7;
+        }
+    };
     SubmissionGridFooterComponent = __decorate([
         core_1.Component({
             templateUrl: './SubmissionGridFooter.component.html',

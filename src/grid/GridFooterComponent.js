@@ -19,13 +19,22 @@ var GridFooterComponent = /** @class */ (function () {
         core_1.Input()
     ], GridFooterComponent.prototype, "body", void 0);
     __decorate([
+        core_1.Input()
+    ], GridFooterComponent.prototype, "createText", void 0);
+    __decorate([
+        core_1.Input()
+    ], GridFooterComponent.prototype, "size", void 0);
+    __decorate([
+        core_1.Input()
+    ], GridFooterComponent.prototype, "actionAllowed", void 0);
+    __decorate([
         core_1.Output()
     ], GridFooterComponent.prototype, "pageChanged", void 0);
     __decorate([
         core_1.Output()
     ], GridFooterComponent.prototype, "createItem", void 0);
     __decorate([
-        core_1.ViewChild(core_1.TemplateRef)
+        core_1.ViewChild(core_1.TemplateRef, { static: true })
     ], GridFooterComponent.prototype, "template", void 0);
     return GridFooterComponent;
 }());

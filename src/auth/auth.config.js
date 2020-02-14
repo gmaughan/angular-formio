@@ -16,3 +16,8 @@ var FormioAuthConfig = /** @class */ (function () {
     return FormioAuthConfig;
 }());
 exports.FormioAuthConfig = FormioAuthConfig;
+var FormioOauthType;
+(function (FormioOauthType) {
+    FormioOauthType["okta"] = "okta";
+    FormioOauthType["saml"] = "saml";
+})(FormioOauthType = exports.FormioOauthType || (exports.FormioOauthType = {}));

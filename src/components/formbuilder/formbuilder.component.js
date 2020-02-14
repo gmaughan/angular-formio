@@ -11,11 +11,16 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var formiojs_1 = require("formiojs");
+var lodash_1 = require("lodash");
 /* tslint:disable */
 var FormBuilderComponent = /** @class */ (function () {
-    function FormBuilderComponent(config) {
+    function FormBuilderComponent(ngZone, config, customTags) {
         var _this = this;
+        this.ngZone = ngZone;
         this.config = config;
+        this.customTags = customTags;
+        this.componentAdding = false;
+        this.noeval = false;
         if (this.config) {
             formiojs_1.Formio.setBaseUrl(this.config.apiUrl);
             formiojs_1.Formio.setProjectUrl(this.config.appUrl);
@@ -28,8 +33,90 @@ var FormBuilderComponent = /** @class */ (function () {
             _this.readyResolve = resolve;
         });
     }
+    FormBuilderComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        formiojs_1.Utils.Evaluator.noeval = this.noeval;
+        if (this.refresh) {
+            this.refreshSubscription = this.refresh.subscribe(function () {
+                _this.ngZone.runOutsideAngular(function () {
+                    _this.buildForm(_this.form);
+                });
+            });
+        }
+    };
+    FormBuilderComponent.prototype.setInstance = function (instance) {
+        var _this = this;
+        this.formio = instance;
+        instance.off('addComponent');
+        instance.off('saveComponent');
+        instance.off('updateComponent');
+        instance.off('removeComponent');
+        instance.on('addComponent', function (component, parent, path, index, isNew) {
+            _this.ngZone.run(function () {
+                if (isNew) {
+                    _this.componentAdding = true;
+                }
+                else {
+                    _this.change.emit({
+                        type: 'addComponent',
+                        builder: instance,
+                        form: instance.schema,
+                        component: component,
+                        parent: parent,
+                        path: path,
+                        index: index
+                    });
+                    _this.componentAdding = false;
+                }
+            });
+        });
+        instance.on('saveComponent', function (component, original, parent, path, index, isNew) {
+            _this.ngZone.run(function () {
+                _this.change.emit({
+                    type: _this.componentAdding ? 'addComponent' : 'saveComponent',
+                    builder: instance,
+                    form: instance.schema,
+                    component: component,
+                    originalComponent: original,
+                    parent: parent,
+                    path: path,
+                    index: index,
+                    isNew: isNew || false
+                });
+                _this.componentAdding = false;
+            });
+        });
+        instance.on('updateComponent', function (component) {
+            _this.ngZone.run(function () {
+                _this.change.emit({
+                    type: 'updateComponent',
+                    builder: instance,
+                    form: instance.schema,
+                    component: component
+                });
+            });
+        });
+        instance.on('removeComponent', function (component, parent, path, index) {
+            _this.ngZone.run(function () {
+                _this.change.emit({
+                    type: 'deleteComponent',
+                    builder: instance,
+                    form: instance.schema,
+                    component: component,
+                    parent: parent,
+                    path: path,
+                    index: index
+                });
+            });
+        });
+        this.ngZone.run(function () {
+            _this.readyResolve(instance);
+        });
+        return instance;
+    };
     FormBuilderComponent.prototype.setDisplay = function (display) {
-        return this.builder.setDisplay(display);
+        var _this = this;
+        return this.builder.setDisplay(display).then(function (instance) { return _this.setInstance(instance); });
     };
     FormBuilderComponent.prototype.buildForm = function (form) {
         var _this = this;
@@ -37,34 +124,38 @@ var FormBuilderComponent = /** @class */ (function () {
             return;
         }
         if (this.builder) {
-            return this.builder.instance.form = form;
+            return this.setDisplay(form.display).then(function () {
+                _this.builder.form = form;
+                _this.builder.instance.form = form;
+                return _this.builder.instance;
+            });
         }
-        this.builder = new formiojs_1.Formio.FormBuilder(this.builderElement.nativeElement, form, this.options || {});
-        this.builder.render().then(function (instance) {
-            _this.formio = instance;
-            instance.on('saveComponent', function () { return _this.change.emit({
-                type: 'saveComponent',
-                form: instance.schema
-            }); });
-            instance.on('updateComponent', function () { return _this.change.emit({
-                type: 'updateComponent',
-                form: instance.schema
-            }); });
-            instance.on('deleteComponent', function () { return _this.change.emit({
-                type: 'deleteComponent',
-                form: instance.schema
-            }); });
-            _this.readyResolve(instance);
-            return instance;
-        });
+        var Builder = this.formbuilder || formiojs_1.FormBuilder;
+        var extraTags = this.customTags ? this.customTags.tags : [];
+        this.builder = new Builder(this.builderElement.nativeElement, form, lodash_1.assign({
+            icons: 'fontawesome',
+            sanitizeConfig: {
+                addTags: extraTags
+            }
+        }, this.options || {}));
+        return this.builder.ready.then(function (instance) { return _this.setInstance(instance); });
     };
     FormBuilderComponent.prototype.ngOnChanges = function (changes) {
+        var _this = this;
+        formiojs_1.Utils.Evaluator.noeval = this.noeval;
         if (changes.form && changes.form.currentValue) {
-            this.buildForm(changes.form.currentValue || { components: [] });
+            this.ngZone.runOutsideAngular(function () {
+                _this.buildForm(changes.form.currentValue || { components: [] });
+            });
         }
     };
-    FormBuilderComponent.prototype.ngAfterViewInit = function () {
-        this.buildForm(this.form);
+    FormBuilderComponent.prototype.ngOnDestroy = function () {
+        if (this.refreshSubscription) {
+            this.refreshSubscription.unsubscribe();
+        }
+        if (this.formio) {
+            this.formio.destroy();
+        }
     };
     __decorate([
         core_1.Input()
@@ -73,10 +164,19 @@ var FormBuilderComponent = /** @class */ (function () {
         core_1.Input()
     ], FormBuilderComponent.prototype, "options", void 0);
     __decorate([
+        core_1.Input()
+    ], FormBuilderComponent.prototype, "formbuilder", void 0);
+    __decorate([
+        core_1.Input()
+    ], FormBuilderComponent.prototype, "noeval", void 0);
+    __decorate([
+        core_1.Input()
+    ], FormBuilderComponent.prototype, "refresh", void 0);
+    __decorate([
         core_1.Output()
     ], FormBuilderComponent.prototype, "change", void 0);
     __decorate([
-        core_1.ViewChild('builder')
+        core_1.ViewChild('builder', { static: true })
     ], FormBuilderComponent.prototype, "builderElement", void 0);
     FormBuilderComponent = __decorate([
         core_1.Component({
@@ -87,7 +187,8 @@ var FormBuilderComponent = /** @class */ (function () {
         })
         /* tslint:enable */
         ,
-        __param(0, core_1.Optional())
+        __param(1, core_1.Optional()),
+        __param(2, core_1.Optional())
     ], FormBuilderComponent);
     return FormBuilderComponent;
 }());

@@ -34,7 +34,7 @@ var FormioAuthService = /** @class */ (function () {
         this.registerForm =
             this.appConfig.appUrl +
                 '/' +
-                lodash_1.get(this.config, 'register.form', 'user/login');
+                lodash_1.get(this.config, 'register.form', 'user/register');
         this.onLogin = new core_1.EventEmitter();
         this.onLogout = new core_1.EventEmitter();
         this.onRegister = new core_1.EventEmitter();
@@ -47,7 +47,9 @@ var FormioAuthService = /** @class */ (function () {
         // Register for the core events.
         formiojs_1.Formio.events.on('formio.badToken', function () { return _this.logoutError(); });
         formiojs_1.Formio.events.on('formio.sessionExpired', function () { return _this.logoutError(); });
-        this.init();
+        if (!this.config.delayAuth) {
+            this.init();
+        }
     }
     FormioAuthService.prototype.onLoginSubmit = function (submission) {
         this.setUser(submission);
@@ -81,7 +83,19 @@ var FormioAuthService = /** @class */ (function () {
             _this.roles = {};
             return null;
         });
-        this.userReady = formiojs_1.Formio.currentUser().then(function (user) {
+        var currentUserPromise;
+        if (this.config.oauth) {
+            // Make a fix to the hash to remove starting "/" that angular might put there.
+            if (window.location.hash && window.location.hash.match(/^#\/access_token/)) {
+                history.pushState(null, null, window.location.hash.replace(/^#\/access_token/, '#access_token'));
+            }
+            // Initiate the SSO if they provide oauth settings.
+            currentUserPromise = formiojs_1.Formio.ssoInit(this.config.oauth.type, this.config.oauth.options);
+        }
+        else {
+            currentUserPromise = formiojs_1.Formio.currentUser();
+        }
+        this.userReady = currentUserPromise.then(function (user) {
             _this.setUser(user);
             return user;
         });
@@ -95,15 +109,16 @@ var FormioAuthService = /** @class */ (function () {
         }
     };
     FormioAuthService.prototype.setUser = function (user) {
+        var namespace = formiojs_1.Formio.namespace || 'formio';
         if (user) {
             this.user = user;
-            localStorage.setItem('formioAppUser', JSON.stringify(user));
+            localStorage.setItem(namespace + "AppUser", JSON.stringify(user));
             this.setUserRoles();
         }
         else {
             this.user = null;
             this.is = {};
-            localStorage.removeItem('formioAppUser');
+            localStorage.removeItem(namespace + "AppUser");
             formiojs_1.Formio.clearCache();
             formiojs_1.Formio.setUser(null);
         }

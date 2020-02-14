@@ -8,16 +8,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var FormManagerDeleteComponent = /** @class */ (function () {
-    function FormManagerDeleteComponent(service, router, route) {
+    function FormManagerDeleteComponent(service, router, route, alerts) {
         this.service = service;
         this.router = router;
         this.route = route;
+        this.alerts = alerts;
     }
     FormManagerDeleteComponent.prototype.onDelete = function () {
         var _this = this;
         this.service.formio.deleteForm().then(function () {
             _this.router.navigate(['../../'], { relativeTo: _this.route });
-        });
+        }).catch(function (err) { return _this.alerts.setAlert({ type: 'danger', message: (err.message || err) }); });
     };
     FormManagerDeleteComponent.prototype.onCancel = function () {
         this.router.navigate(['../', 'view'], { relativeTo: this.route });

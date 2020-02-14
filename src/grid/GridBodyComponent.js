@@ -13,6 +13,7 @@ var GridBodyComponent = /** @class */ (function () {
         this.firstItem = 0;
         this.lastItem = 0;
         this.skip = 0;
+        this.limit = 0;
         this.total = 0;
         this.rowSelect = new core_1.EventEmitter();
         this.rowAction = new core_1.EventEmitter();
@@ -42,10 +43,11 @@ var GridBodyComponent = /** @class */ (function () {
         this.firstItem = query.skip + 1;
         this.lastItem = this.firstItem + items.length - 1;
         this.total = items.serverCount;
+        this.limit = query.limit;
         this.skip = Math.floor(items.skip / query.limit) + 1;
         this.loading = false;
         lodash_1.each(items, function (item) {
-            _this.rows.push(item);
+            _this.rows.push(lodash_1.clone(item));
         });
         return this.rows;
     };
@@ -53,13 +55,16 @@ var GridBodyComponent = /** @class */ (function () {
         core_1.Input()
     ], GridBodyComponent.prototype, "header", void 0);
     __decorate([
+        core_1.Input()
+    ], GridBodyComponent.prototype, "actionAllowed", void 0);
+    __decorate([
         core_1.Output()
     ], GridBodyComponent.prototype, "rowSelect", void 0);
     __decorate([
         core_1.Output()
     ], GridBodyComponent.prototype, "rowAction", void 0);
     __decorate([
-        core_1.ViewChild(core_1.TemplateRef)
+        core_1.ViewChild(core_1.TemplateRef, { static: true })
     ], GridBodyComponent.prototype, "template", void 0);
     return GridBodyComponent;
 }());
